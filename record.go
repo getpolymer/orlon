@@ -13,7 +13,6 @@ import (
 )
 
 func test() error {
-
 	// Get the SHELL which is getting currently used
 	shell := os.Getenv("SHELL")
 	if shell == "" {
@@ -29,10 +28,11 @@ func test() error {
 		return err
 	}
 	// Make sure to close the pty at the end.
-	defer func() { _ = ptmx.Close() }() // Best effort.
+	defer ptmx.Close() // Best effort.
 
 	// Handle pty size.
 	ch := make(chan os.Signal, 1)
+	defer close(ch)
 	signal.Notify(ch, syscall.SIGWINCH)
 	go func() {
 		for range ch {
@@ -42,17 +42,22 @@ func test() error {
 		}
 	}()
 	ch <- syscall.SIGWINCH // Initial resize.
-
 	// Set stdin in raw mode.
 	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(err)
 	}
-	defer func() { _ = terminal.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
+	defer terminal.Restore(int(os.Stdin.Fd()), oldState) // Best effort.
 
+	thenga, _ := os.Create("/tmp/thenga.txt")
+	defer thenga.Close()
+	w := io.MultiWriter(ptmx, thenga)
+	w2 := io.MultiWriter(os.Stdout, thenga)
 	// Copy stdin to the pty and the pty to stdout.
-	go func() { _, _ = io.Copy(ptmx, os.Stdin) }()
-	_, _ = io.Copy(os.Stdout, ptmx)
+	go func() {
+		_, _ = io.Copy(w, os.Stdin)
+	}()
+	_, _ = io.Copy(w2, ptmx)
 
 	return nil
 }
