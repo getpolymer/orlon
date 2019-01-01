@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.9.1/xterm.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.9.1/xterm.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.9.1/addons/fit/fit.js"></script>
+</head>
+
+<body>
+  <div id="terminal"></div>
+  <script>
+    var socket = new WebSocket("ws://0.0.0.0:8080/ws");
+    socket.onopen = function() {
+      console.log("Status: Connected");
+    };
+    socket.onmessage = function(e) {
+      term.write(e.data);
+      console.log(e.data.length);
+    };
+    var term = new Terminal({cols:200,rows:50});
+    // term.setOption("cols",200)
+    // term.setOption("rows",50)
+    console.log(term);
+    term.open(document.getElementById('terminal'));
+  </script>
+</body>
+
+</html>
