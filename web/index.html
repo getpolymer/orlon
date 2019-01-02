@@ -11,7 +11,8 @@
 <body>
   <div id="terminal"></div>
   <script>
-    var socket = new WebSocket("ws://0.0.0.0:8080/ws");
+    const host = window.location.host;
+    const socket = new WebSocket("ws://"+host+"/ws");
     socket.onopen = function() {
       console.log("Status: Connected");
     };
