@@ -11,7 +11,7 @@ var (
 		Use:   "record",
 		Short: "Record your terminal",
 		Long:  "Record your terminal and save it in a file",
-		Run:   runCmdRecord,
+		RunE:  runCmdRecord,
 	}
 )
 

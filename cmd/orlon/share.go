@@ -11,7 +11,7 @@ var (
 		Use:   "share",
 		Short: "Share your terminal",
 		Long:  "Share your terminal to the web",
-		Run:   runCmdShare,
+		RunE:  runCmdShare,
 	}
 )
 
