@@ -8,12 +8,11 @@ ORG_PATH="github.com/getpolymer"
 PROJ="orlon"
 REPO_PATH="${ORG_PATH}/${PROJ}"
 
-all:
-	build
+all: build
 
 build:
-	$(GOBUILD) -i -ldflags "${ldflags}" -o "$(BINARY_DIR)/$(BINARY_NAME)" "$(REPO_PATH)/cmd/orlon"
+	$(GOBUILD) -i -o "$(BINARY_DIR)/$(BINARY_NAME)" "$(REPO_PATH)/cmd/orlon"
 
 clean:
 	$(GOCLEAN)
-	rm -f "$(BINARY_DIR)"
+	rm -rf "$(BINARY_DIR)"
