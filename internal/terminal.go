@@ -1,37 +1,59 @@
-package main
+package internal
 
 import (
 	"io"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
 	"syscall"
 
+	"github.com/gorilla/websocket"
 	"github.com/kr/pty"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 type webWriter struct{}
 
+var (
+	connUrl    = &url.URL{Scheme: "ws", Host: "localhost:8080", Path: "/echo"}
+	conn, _, _ = websocket.DefaultDialer.Dial(connUrl.String(), nil)
+)
+
+func PublishToServer(data []byte) error {
+	lock.RLock()
+	defer lock.RUnlock()
+
+	err := conn.WriteMessage(websocket.TextMessage, data)
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
 func (ww webWriter) Write(data []byte) (int, error) {
-	Publish(data)
+	PublishToServer(data)
 	return len(data), nil
 }
 
-func runPseudoTerminal() error {
+func RunPseudoTerminal() error {
 	// Get the SHELL which is getting currently used
 	shell := os.Getenv("SHELL")
 	if shell == "" {
 		shell = "sh"
 	}
+
 	// Create arbitrary command.
 	c := exec.Command(shell)
+
 	// Start the command with a pty.
 	ptmx, err := pty.Start(c)
 	if err != nil {
 		return err
 	}
+
 	// Make sure to close the pty at the end.
 	defer ptmx.Close() // Best effort.
 

@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"log"
@@ -24,8 +24,24 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	Subscribe(NewSocketWriter(ws))
 }
 
+func serveEchoWs(w http.ResponseWriter, r *http.Request) {
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		if _, ok := err.(websocket.HandshakeError); !ok {
+			log.Println(err)
+		}
+		return
+	}
+
+	for {
+		_, message, _ := ws.ReadMessage()
+		Publish(message)
+	}
+}
+
 func serveWebSocket() {
 	http.HandleFunc("/ws", serveWs)
+	http.HandleFunc("/echo", serveEchoWs)
 }
 
 func serveWebSite() {
@@ -43,11 +59,10 @@ func setupLogger() {
 	log.SetOutput(f)
 }
 
-func main() {
+func StartServer() {
 	setupLogger()
 	serveWebSite()
 	serveWebSocket()
-	go runPseudoTerminal()
 	if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
 		log.Fatal(err)
 	}

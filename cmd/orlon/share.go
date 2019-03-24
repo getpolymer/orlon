@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+
+	"github.com/getpolymer/orlon/internal"
 )
 
 var (
@@ -20,5 +20,7 @@ func init() {
 }
 
 func runCmdShare(cmd *cobra.Command, args []string) error {
-	return fmt.Errorf("Not Implemented")
+	internal.RunPseudoTerminal()
+
+	return nil
 }
