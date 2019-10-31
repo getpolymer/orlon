@@ -1,0 +1,27 @@
+syntax = "proto3";
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Taks we have to do
+message Share {
+    // Unique integer identifier of the todo task
+    int64 id = 1;
+    // Title of the terminal
+    string title = 2;
+    // Detail description of the terminal
+    string description = 3;
+}
+
+// Request data to create new request
+message CreateRequest{
+    // API versioning: it is my best practice to specify version explicitly
+    string api = 1;
+
+}
+
+// Response that contains data for created object
+message CreateResponse{
+    // API versioning: it is my best practice to specify version explicitly
+    string api = 1;
+}
